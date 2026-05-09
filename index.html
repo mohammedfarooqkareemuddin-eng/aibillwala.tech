@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI BillWala – Smart Invoice Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; color: white; }
+        .header h1 { font-size: 36px; }
+        .header h1 span { color: #4CAF50; }
+        .header p { opacity: 0.8; font-size: 16px; }
+        .card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin-bottom: 20px; }
+        .card h2 { margin-bottom: 15px; color: #333; display: flex; align-items: center; gap: 10px; }
+        .card textarea { width: 100%; padding: 16px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; height: 120px; resize: vertical; }
+        .card textarea:focus { border-color: #4CAF50; outline: none; }
+        .examples { margin-top: 10px; font-size: 13px; color: #666; }
+        .examples span { background: #e8f5e9; padding: 4px 10px; border-radius: 15px; cursor: pointer; margin: 3px; display: inline-block; }
+        .btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-download { background: #2196F3; margin-top: 10px; }
+        .loading { text-align: center; display: none; padding: 20px; color: #4CAF50; }
+        .loading.active { display: block; }
+        .invoice-preview { display: none; }
+        .invoice-preview.active { display: block; }
+        .error-message { color: #f44336; text-align: center; margin-top: 10px; display: none; }
+        @media (max-width: 600px) { .header h1 { font-size: 28px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI <span>BillWala</span></h1>
+            <p>Describe your work in plain Hindi or English. Get a professional invoice instantly.</p>
+        </div>
+
+        <div class="card">
+            <h2>📝 What work did you do?</h2>
+            <textarea id="userPrompt" placeholder="Example: Bhaiya, ABC Corp ke liye 5 hours web development kiya Rs 500/hour, plus Rs 200 travel charges ka bill bana do..."></textarea>
+            <div class="examples">
+                <span onclick="setExample('5 hours web development at Rs 800/hour for XYZ Ltd, plus Rs 300 travel')">Freelancer</span>
+                <span onclick="setExample('Monthly tiffin service for 22 days at Rs 120 per day for Priya madam, 10% advance discount')">Tiffin Service</span>
+                <span onclick="setExample('GST filing Rs 3500, company registration Rs 12000 for Mehta Associates')">CA/Tax</span>
+            </div>
+            <button class="btn" id="generateBtn" onclick="generateInvoice()">✨ Generate Invoice</button>
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i> AI is preparing your invoice...
+            </div>
+            <div class="error-message" id="errorMsg"></div>
+        </div>
+
+        <div class="card invoice-preview" id="invoicePreview">
+            <h2>📄 Your Invoice</h2>
+            <div id="invoiceContent"></div>
+            <button class="btn btn-download" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
+        </div>
+    </div>
+
+    <script>
+        // 👇 Replace with your actual Apps Script URL
+        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbznQ3QyWen-4XCn6meX6Oo275At8p79tyT549Y2mxcv_axJhE-delpHrHNHgWVBO6E/exec';
+
+        function setExample(text) {
+            document.getElementById('userPrompt').value = text;
+        }
+
+        async function generateInvoice() {
+            const prompt = document.getElementById('userPrompt').value.trim();
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.style.display = 'none';
+            
+            if (!prompt) { 
+                errorEl.innerText = 'Please describe your billing request!';
+                errorEl.style.display = 'block';
+                return; 
+            }
+
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('invoicePreview').classList.remove('active');
+
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                
+                if (!response.ok) throw new Error('Backend error: ' + response.status);
+                const data = await response.json();
+                if (!data || !data.items) throw new Error('AI could not parse the request. Please try again with more details.');
+
+                const html = buildInvoiceHTML(data);
+                document.getElementById('invoiceContent').innerHTML = html;
+                document.getElementById('invoicePreview').classList.add('active');
+            } catch (error) {
+                errorEl.innerText = error.message || 'Something went wrong. Please try again.';
+                errorEl.style.display = 'block';
+            }
+
+            document.getElementById('generateBtn').disabled = false;
+            document.getElementById('loading').classList.remove('active');
+        }
+
+        function buildInvoiceHTML(data) {
+            const bName = data.businessName || 'AI BillWala';
+            const cName = data.clientName || 'Valued Client';
+            const items = data.items || [];
+            const extras = data.extraCharges || [];
+            const currency = data.currency || 'Rs';
+            let subtotal = 0;
+            items.forEach(item => subtotal += (item.quantity || 1) * (item.rate || 0));
+            let extraTotal = 0;
+            extras.forEach(extra => extraTotal += extra.amount || 0);
+            const discountPct = data.discountPercentage || 0;
+            const discountAmt = Math.round((subtotal + extraTotal) * discountPct / 100);
+            const grandTotal = subtotal + extraTotal - discountAmt;
+
+            let itemsHTML = '';
+            items.forEach(item => {
+                itemsHTML += `<tr><td style="padding:8px">${item.name}</td><td style="padding:8px;text-align:center">${item.quantity || 1}</td><td style="padding:8px;text-align:right">${currency} ${item.rate || 0}</td><td style="padding:8px;text-align:right">${currency} ${(item.quantity || 1) * (item.rate || 0)}</td></tr>`;
+            });
+            extras.forEach(extra => {
+                itemsHTML += `<tr><td style="padding:8px">${extra.name}</td><td style="padding:8px;text-align:center">1</td><td style="padding:8px;text-align:right">${currency} ${extra.amount}</td><td style="padding:8px;text-align:right">${currency} ${extra.amount}</td></tr>`;
+            });
+
+            return `
+                <div style="font-family:Arial;padding:20px;color:#333">
+                    <div style="text-align:center;background:linear-gradient(135deg,#0f2027,#2c5364);color:white;padding:20px;border-radius:10px 10px 0 0;margin-bottom:20px">
+                        <h1 style="margin:0;font-size:24px">${bName}</h1>
+                        <p style="margin:5px 0 0;opacity:0.8">Professional Invoice</p>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:20px">
+                        <div><b>Bill To:</b><br>${cName}${data.clientEmail ? '<br>' + data.clientEmail : ''}</div>
+                        <div style="text-align:right"><b>Date:</b><br>${new Date().toLocaleDateString('en-IN')}</div>
+                    </div>
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+                        <tr style="background:#4CAF50;color:white">
+                            <th style="padding:10px;text-align:left">Description</th>
+                            <th style="padding:10px;text-align:center">Qty</th>
+                            <th style="padding:10px;text-align:right">Rate</th>
+                            <th style="padding:10px;text-align:right">Amount</th>
+                        </tr>
+                        ${itemsHTML}
+                    </table>
+                    <div style="text-align:right;border-top:1px solid #ddd;padding-top:15px">
+                        <p>Subtotal: ${currency} ${subtotal + extraTotal}</p>
+                        ${discountPct > 0 ? `<p style="color:#f44336">Discount (${discountPct}%): -${currency} ${discountAmt}</p>` : ''}
+                        <h2 style="color:#4CAF50;margin-top:10px">Grand Total: ${currency} ${grandTotal}</h2>
+                    </div>
+                    ${data.notes ? `<p style="margin-top:20px;padding:10px;background:#f9f9f9;border-left:4px solid #4CAF50"><b>Notes:</b> ${data.notes}</p>` : ''}
+                    <p style="text-align:center;margin-top:20px;color:#999;font-size:12px">Generated by AI BillWala • Thank you for your business!</p>
+                </div>
+            `;
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('invoiceContent');
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: 'AI_BillWala_Invoice.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>
