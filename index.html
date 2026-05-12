@@ -61,8 +61,9 @@
     </div>
 
     <script>
-        // 👇 Your live Cloudflare Worker URL – already inserted
-        const BACKEND_URL = 'https://icv-shape-eee6e.mohammedfaroookareemuddin.workers.dev';
+        // 👇 Use the CORS proxy to forward requests to your Apps Script backend
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUVaggqoEOIbdRi6jZ6JcduV_tyEveX7WWgz-b35E9_7MF0hndcXxoODV2pDZ01YF2/exec';
+        const BACKEND_URL = 'https://corsproxy.io/?' + encodeURIComponent(SCRIPT_URL);
 
         function setExample(text) {
             document.getElementById('userPrompt').value = text;
