@@ -20,7 +20,6 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -36,7 +35,6 @@
         .header p {
             color: #4a5568;
         }
-        /* Card */
         .card {
             background: white;
             border-radius: 24px;
@@ -210,8 +208,8 @@
 </div>
 
 <script>
-    // ✅ UPDATED BACKEND URL (YOUR DEPLOYED APPS SCRIPT)
-    const BACKEND_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycby0CO9gvRbXBSbdO_xZWApC34PzKfHQlHV1JaZ81DpOTFgPUkNYfj2EaaFgZodxo2lX/exec');
+    // ✅ UPDATED CORS PROXY (more reliable than corsproxy.io)
+    const BACKEND_URL = 'https://thingproxy.freeboard.io/fetch/' + encodeURIComponent('https://script.google.com/macros/s/AKfycby0CO9gvRbXBSbdO_xZWApC34PzKfHQlHV1JaZ81DpOTFgPUkNYfj2EaaFgZodxo2lX/exec');
 
     const promptInput = document.getElementById('promptInput');
     const generateBtn = document.getElementById('generateBtn');
@@ -225,7 +223,6 @@
             return;
         }
 
-        // Show loading state
         generateBtn.disabled = true;
         generateBtn.innerHTML = '<span class="loader"></span> Generating...';
         resultCard.style.display = 'none';
@@ -249,7 +246,7 @@
             }
         } catch (error) {
             console.error('Fetch error:', error);
-            showError('Network error: ' + error.message + '. Check your internet or try again.');
+            showError('Network error: ' + error.message + '. Try switching Wi-Fi/mobile data or use a desktop browser.');
         } finally {
             generateBtn.disabled = false;
             generateBtn.innerHTML = '✨ Generate Invoice';
@@ -257,10 +254,8 @@
     });
 
     function displayInvoice(inv) {
-        // Format currency
         const formatMoney = (amount) => `₹${amount.toLocaleString('en-IN')}`;
         
-        // Build items rows
         let itemsHtml = '';
         if (inv.items && inv.items.length) {
             inv.items.forEach(item => {
@@ -318,7 +313,6 @@
         resultCard.style.display = 'block';
     }
 
-    // Helper to prevent XSS
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, function(m) {
@@ -326,8 +320,6 @@
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
             return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
         });
     }
 </script>
