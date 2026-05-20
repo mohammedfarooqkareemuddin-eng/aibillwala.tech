@@ -203,13 +203,13 @@
     </div>
 
     <div class="footer">
-        AI BillWala • Smart invoicing • CORS proxy enabled
+        AI BillWala • Powered by Cloudflare Worker
     </div>
 </div>
 
 <script>
-    // ✅ UPDATED CORS PROXY (more reliable than corsproxy.io)
-    const BACKEND_URL = 'https://thingproxy.freeboard.io/fetch/' + encodeURIComponent('https://script.google.com/macros/s/AKfycby0CO9gvRbXBSbdO_xZWApC34PzKfHQlHV1JaZ81DpOTFgPUkNYfj2EaaFgZodxo2lX/exec');
+    // 🔥 REPLACE THIS URL WITH YOUR CLOUDFLARE WORKER URL
+    const BACKEND_URL = 'https://morning-butterfly.ddin.workers.dev';  // <--- CHANGE THIS
 
     const promptInput = document.getElementById('promptInput');
     const generateBtn = document.getElementById('generateBtn');
@@ -230,9 +230,7 @@
         try {
             const response = await fetch(BACKEND_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: prompt })
             });
 
@@ -242,11 +240,11 @@
             if (data.success && data.data) {
                 displayInvoice(data.data);
             } else {
-                showError(data.error || 'Failed to generate invoice. Please try again.');
+                showError(data.error || 'Failed to generate invoice.');
             }
         } catch (error) {
             console.error('Fetch error:', error);
-            showError('Network error: ' + error.message + '. Try switching Wi-Fi/mobile data or use a desktop browser.');
+            showError('Network error: ' + error.message);
         } finally {
             generateBtn.disabled = false;
             generateBtn.innerHTML = '✨ Generate Invoice';
@@ -255,61 +253,37 @@
 
     function displayInvoice(inv) {
         const formatMoney = (amount) => `₹${amount.toLocaleString('en-IN')}`;
-        
         let itemsHtml = '';
         if (inv.items && inv.items.length) {
             inv.items.forEach(item => {
-                itemsHtml += `
-                    <tr>
-                        <td>${escapeHtml(item.description || 'Service')}</td>
-                        <td style="text-align:center">${item.hours || 0}</td>
-                        <td style="text-align:right">${formatMoney(item.rate || 0)}</td>
-                        <td style="text-align:right">${formatMoney(item.total || 0)}</td>
-                    </tr>
-                `;
+                itemsHtml += `<tr><td>${escapeHtml(item.description)}</td><td style="text-align:center">${item.hours}</td><td style="text-align:right">${formatMoney(item.rate)}</td><td style="text-align:right">${formatMoney(item.total)}</td></tr>`;
             });
         } else {
             itemsHtml = '<tr><td colspan="4" style="text-align:center">No items</td></tr>';
         }
-
         const html = `
             <div class="invoice-header">
-                <div class="invoice-title">
-                    <h2>INVOICE</h2>
-                </div>
+                <div class="invoice-title"><h2>INVOICE</h2></div>
                 <div class="invoice-meta">
-                    <p><strong>Invoice #:</strong> ${escapeHtml(inv.invoiceNumber || 'N/A')}</p>
-                    <p><strong>Date:</strong> ${escapeHtml(inv.date || new Date().toLocaleDateString('en-IN'))}</p>
-                    <p><strong>Client:</strong> ${escapeHtml(inv.clientName || '—')}</p>
+                    <p><strong>Invoice #:</strong> ${escapeHtml(inv.invoiceNumber)}</p>
+                    <p><strong>Date:</strong> ${escapeHtml(inv.date)}</p>
+                    <p><strong>Client:</strong> ${escapeHtml(inv.clientName)}</p>
                 </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th style="width:80px">Hours</th>
-                        <th style="width:100px">Rate</th>
-                        <th style="width:100px">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${itemsHtml}
-                </tbody>
-            </table>
+            <table><thead><tr><th>Description</th><th>Hours</th><th>Rate</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
             <div class="totals">
-                <p><strong>Subtotal:</strong> ${formatMoney(inv.subtotal || 0)}</p>
-                <p><strong>Tax (GST):</strong> ${formatMoney(inv.tax || 0)}</p>
-                <p style="font-size:1.3rem; margin-top:10px"><strong>Total Due:</strong> ${formatMoney(inv.amountDue || inv.total || 0)}</p>
+                <p><strong>Subtotal:</strong> ${formatMoney(inv.subtotal)}</p>
+                <p><strong>Tax (GST):</strong> ${formatMoney(inv.tax)}</p>
+                <p style="font-size:1.3rem"><strong>Total Due:</strong> ${formatMoney(inv.amountDue)}</p>
             </div>
-            <p style="font-size:0.75rem; text-align:center; margin-top:25px; color:#4b5563">Thank you for your business!</p>
+            <p style="text-align:center">Thank you for your business!</p>
         `;
-        
         invoiceContent.innerHTML = html;
         resultCard.style.display = 'block';
     }
 
     function showError(msg) {
-        invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}<br><br>💡 Try a prompt like:<br> "WordPress site 10 hours at Rs 1200/hr for ABC Ltd"</div>`;
+        invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}<br><br>💡 Try: "WordPress site 10 hours at Rs 1200/hr for ABC Ltd"</div>`;
         resultCard.style.display = 'block';
     }
 
