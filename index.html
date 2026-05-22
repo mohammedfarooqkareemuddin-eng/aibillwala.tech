@@ -1,301 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>AI BillWala - Smart Invoice Generator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 8px;
-        }
-        .header p {
-            color: #4a5568;
-        }
-        .card {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1);
-            padding: 24px;
-            margin-bottom: 30px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-        textarea {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 1rem;
-            resize: vertical;
-            transition: all 0.2s;
-        }
-        textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-        }
-        button {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            width: 100%;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
-        }
-        button:active {
-            transform: translateY(1px);
-        }
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .invoice-preview {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-        }
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px dashed #cbd5e1;
-        }
-        .invoice-title h2 {
-            color: #1e3c72;
-            font-size: 1.5rem;
-        }
-        .invoice-meta {
-            text-align: right;
-        }
-        .invoice-meta p {
-            margin: 4px 0;
-            color: #475569;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            text-align: left;
-            padding: 12px 8px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        th {
-            background-color: #eef2ff;
-            color: #1e3c72;
-        }
-        .totals {
-            text-align: right;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid #cbd5e1;
-        }
-        .totals p {
-            margin: 6px 0;
-        }
-        .error-box {
-            background: #fee2e2;
-            border-left: 5px solid #ef4444;
-            padding: 15px;
-            border-radius: 12px;
-            color: #991b1b;
-            margin-top: 20px;
-        }
-        .footer {
-            text-align: center;
-            color: #6c757d;
-            font-size: 0.8rem;
-            margin-top: 30px;
-        }
-        @media (max-width: 640px) {
-            .invoice-header {
-                flex-direction: column;
-                align-items: start;
-                gap: 10px;
-            }
-            .invoice-meta {
-                text-align: left;
-            }
-            th, td {
-                font-size: 0.85rem;
-                padding: 8px 4px;
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>🧾 AI BillWala</h1>
-        <p>Describe your work — get an instant invoice</p>
-    </div>
+export default {
+  async fetch(request) {
+    // Handle GET request - for testing
+    if (request.method === 'GET') {
+      return new Response(JSON.stringify({ status: "AI BillWala Backend is Running" }), {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+      });
+    }
+    
+    // Handle CORS preflight
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      });
+    }
 
-    <div class="card">
-        <div class="input-group">
-            <label>📝 Describe your project (hours, rate, client)</label>
-            <textarea id="promptInput" rows="4" placeholder="Example: Web development 5 hours at Rs 800/hr for XYZ Corp"></textarea>
-        </div>
-        <button id="generateBtn">✨ Generate Invoice</button>
-    </div>
+    // Handle POST requests for invoices
+    if (request.method === 'POST') {
+      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0CO9gvRbXBSbdO_xZWApC34PzKfHQlHV1JaZ81DpOTFgPUkNYfj2EaaFgZodxo2lX/exec';
+      
+      const requestBody = await request.text();
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: requestBody,
+      });
+      const responseData = await response.text();
+      
+      return new Response(responseData, {
+        status: response.status,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
 
-    <div class="card" id="resultCard" style="display: none;">
-        <div class="invoice-preview" id="invoiceContent"></div>
-    </div>
-
-    <div class="footer">
-        AI BillWala • Powered by Cloudflare Worker
-    </div>
-</div>
-
-<script>
-    // 🔥 REPLACE THIS URL WITH YOUR CLOUDFLARE WORKER URL
-    const BACKEND_URL = 'https://morning-butterfly.ddin.workers.dev';  // <--- CHANGE THIS
-
-    const promptInput = document.getElementById('promptInput');
-    const generateBtn = document.getElementById('generateBtn');
-    const resultCard = document.getElementById('resultCard');
-    const invoiceContent = document.getElementById('invoiceContent');
-
-    generateBtn.addEventListener('click', async () => {
-        const prompt = promptInput.value.trim();
-        if (!prompt) {
-            alert('Please enter a project description.');
-            return;
-        }
-
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = '<span class="loader"></span> Generating...';
-        resultCard.style.display = 'none';
-
-        try {
-            const response = await fetch(BACKEND_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt })
-            });
-
-            const data = await response.json();
-            console.log('Backend response:', data);
-
-            if (data.success && data.data) {
-                displayInvoice(data.data);
-            } else {
-                showError(data.error || 'Failed to generate invoice.');
-            }
-        } catch (error) {
-            console.error('Fetch error:', error);
-            showError('Network error: ' + error.message);
-        } finally {
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = '✨ Generate Invoice';
-        }
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
-
-    function displayInvoice(inv) {
-        const formatMoney = (amount) => `₹${amount.toLocaleString('en-IN')}`;
-        let itemsHtml = '';
-        if (inv.items && inv.items.length) {
-            inv.items.forEach(item => {
-                itemsHtml += `<tr><td>${escapeHtml(item.description)}</td><td style="text-align:center">${item.hours}</td><td style="text-align:right">${formatMoney(item.rate)}</td><td style="text-align:right">${formatMoney(item.total)}</td></tr>`;
-            });
-        } else {
-            itemsHtml = '<tr><td colspan="4" style="text-align:center">No items</td></tr>';
-        }
-        const html = `
-            <div class="invoice-header">
-                <div class="invoice-title"><h2>INVOICE</h2></div>
-                <div class="invoice-meta">
-                    <p><strong>Invoice #:</strong> ${escapeHtml(inv.invoiceNumber)}</p>
-                    <p><strong>Date:</strong> ${escapeHtml(inv.date)}</p>
-                    <p><strong>Client:</strong> ${escapeHtml(inv.clientName)}</p>
-                </div>
-            </div>
-            <table><thead><tr><th>Description</th><th>Hours</th><th>Rate</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
-            <div class="totals">
-                <p><strong>Subtotal:</strong> ${formatMoney(inv.subtotal)}</p>
-                <p><strong>Tax (GST):</strong> ${formatMoney(inv.tax)}</p>
-                <p style="font-size:1.3rem"><strong>Total Due:</strong> ${formatMoney(inv.amountDue)}</p>
-            </div>
-            <p style="text-align:center">Thank you for your business!</p>
-        `;
-        invoiceContent.innerHTML = html;
-        resultCard.style.display = 'block';
-    }
-
-    function showError(msg) {
-        invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}<br><br>💡 Try: "WordPress site 10 hours at Rs 1200/hr for ABC Ltd"</div>`;
-        resultCard.style.display = 'block';
-    }
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-</script>
-</body>
-</html>
+  }
+};
