@@ -4,225 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>AI BillWala - Smart Invoice Generator</title>
-    <!-- SheetJS library for Excel parsing -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 8px;
-        }
-        .header p {
-            color: #4a5568;
-        }
-        .card {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1);
-            padding: 24px;
-            margin-bottom: 30px;
-        }
-        .filter-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .filter-btn {
-            background: #e2e8f0;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .filter-btn.active {
-            background: #2a5298;
-            color: white;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-        textarea {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 1rem;
-            resize: vertical;
-            transition: all 0.2s;
-        }
-        textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-        }
-        .file-upload-area {
-            background: #f1f5f9;
-            border-radius: 16px;
-            padding: 16px;
-            margin-top: 10px;
-            display: none;
-        }
-        .file-upload-area.show {
-            display: block;
-        }
-        .file-label {
-            display: inline-block;
-            background: #3b82f6;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-top: 8px;
-        }
-        .file-label input {
-            display: none;
-        }
-        button {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            width: 100%;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
-        }
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .invoice-preview {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-        }
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px dashed #cbd5e1;
-        }
-        .invoice-title h2 { color: #1e3c72; font-size: 1.5rem; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; background: linear-gradient(135deg, #1e3c72, #2a5298); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .card { background: white; border-radius: 24px; box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 30px; }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+        .filter-btn { background: #e2e8f0; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+        .filter-btn.active { background: #2a5298; color: white; }
+        .input-group { margin-bottom: 20px; }
+        label { font-weight: 600; color: #2d3748; margin-bottom: 8px; display: block; }
+        textarea { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 1rem; resize: vertical; }
+        button { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; border: none; padding: 14px 28px; font-size: 1rem; font-weight: 600; border-radius: 40px; cursor: pointer; width: 100%; }
+        .loader { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .invoice-preview { background: #f8fafc; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; }
+        .invoice-header { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px dashed #cbd5e1; }
+        .invoice-title h2 { color: #1e3c72; }
         .invoice-meta p { margin: 4px 0; color: #475569; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #e2e8f0; }
-        th { background-color: #eef2ff; color: #1e3c72; }
+        th { background-color: #eef2ff; }
         .totals { text-align: right; margin-top: 20px; padding-top: 15px; border-top: 2px solid #cbd5e1; }
-        .error-box {
-            background: #fee2e2;
-            border-left: 5px solid #ef4444;
-            padding: 15px;
-            border-radius: 12px;
-            color: #991b1b;
-            margin-top: 20px;
-        }
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 20px;
-            margin-bottom: 30px;
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .contact-form input, .contact-form textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-        }
-        .contact-form button {
-            width: auto;
-            margin-top: 0;
-        }
-        .whatsapp-btn {
-            background: #25D366;
-            display: inline-block;
-            text-align: center;
-            margin-top: 16px;
-        }
-        .footer {
-            text-align: center;
-            color: #6c757d;
-            font-size: 0.8rem;
-            margin-top: 30px;
-        }
-        @media (max-width: 640px) {
-            .invoice-header { flex-direction: column; align-items: start; gap: 10px; }
-            .invoice-meta { text-align: left; }
-            th, td { font-size: 0.85rem; padding: 8px 4px; }
+        .error-box { background: #fee2e2; border-left: 5px solid #ef4444; padding: 15px; border-radius: 12px; color: #991b1b; margin-top: 20px; }
+        .action-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .action-buttons button { width: auto; padding: 10px 20px; background: #2a5298; }
+        .file-upload-area { background: #f1f5f9; border-radius: 16px; padding: 16px; margin-top: 10px; display: none; }
+        .file-upload-area.show { display: block; }
+        .file-label { display: inline-block; background: #3b82f6; color: white; padding: 8px 16px; border-radius: 30px; cursor: pointer; }
+        .file-label input { display: none; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 20px; margin-bottom: 30px; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .contact-form { display: flex; flex-direction: column; gap: 16px; }
+        .contact-form input, .contact-form textarea { padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; }
+        .whatsapp-btn { background: #25D366; display: inline-block; text-align: center; margin-top: 16px; text-decoration: none; color: white; padding: 12px; border-radius: 40px; }
+        @media print {
+            .card:not(#printArea), .filter-group, .input-group, .action-buttons, .footer, .contact-form, .video-container, .file-upload-area, .header p, button { display: none !important; }
+            .card { box-shadow: none; padding: 0; margin: 0; }
+            body { background: white; padding: 0; }
+            #printArea { margin: 0; padding: 0; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1>🧾 AI BillWala</h1>
-        <p>Describe your work or upload a medical invoice → instant invoice</p>
-    </div>
+    <div class="header"><h1>🧾 AI BillWala</h1><p>Describe your work or upload a medical invoice → instant invoice</p></div>
 
     <div class="card">
         <div class="filter-group" id="filterGroup">
@@ -231,243 +60,140 @@
             <button class="filter-btn" data-category="transportation">🚗 Transportation</button>
             <button class="filter-btn" data-category="accounts">💰 Accounts</button>
         </div>
-
         <div class="input-group">
-            <label>📝 Invoice description (or paste text)</label>
-            <textarea id="promptInput" rows="4" placeholder="Example: Xray 2 units at Rs 500, MRI 1 at Rs 3000, Bed charges 3 days at Rs 2000..."></textarea>
+            <label>📝 Invoice description</label>
+            <textarea id="promptInput" rows="4" placeholder="Xray 2 units at Rs 500, MRI 1 at Rs 3000..."></textarea>
         </div>
-
-        <!-- File upload area – appears only when Medical is selected -->
         <div id="fileUploadArea" class="file-upload-area">
-            <label>📎 Upload Excel or text file (medical invoice)</label>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <label class="file-label">
-                    Choose file (Excel/TXT)
-                    <input type="file" id="invoiceFile" accept=".xlsx, .xls, .csv, .txt">
-                </label>
-                <span id="fileName" style="color: #4a5568; align-self: center;"></span>
-            </div>
-            <p style="font-size: 0.75rem; margin-top: 8px;">The content will be added to the description above.</p>
+            <label class="file-label">Upload Excel/TXT<input type="file" id="invoiceFile" accept=".xlsx, .xls, .csv, .txt"></label>
+            <span id="fileName" style="margin-left: 12px;"></span>
         </div>
-
         <button id="generateBtn">✨ Generate Invoice</button>
     </div>
 
     <div class="card" id="resultCard" style="display: none;">
         <div class="invoice-preview" id="invoiceContent"></div>
-    </div>
-
-    <!-- Intro video placeholder (YouTube) -->
-    <div class="card">
-        <h3 style="margin-bottom: 16px;">📺 How AI BillWala works</h3>
-        <div class="video-container">
-            <iframe id="youtubeVideo" src="https://www.youtube.com/embed/PLACEHOLDER" title="AI BillWala intro" frameborder="0" allowfullscreen></iframe>
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button id="printBtn">🖨️ Print / Save as PDF</button>
         </div>
-        <p style="color: #4a5568;">Replace the video ID later – just edit the iframe `src`.</p>
     </div>
 
-    <!-- Contact section -->
-    <div class="card">
-        <h3 style="margin-bottom: 16px;">📬 Contact us</h3>
-        <div class="contact-form" id="contactForm">
-            <input type="text" id="contactName" placeholder="Your name" required>
-            <input type="email" id="contactEmail" placeholder="Email address" required>
-            <textarea id="contactMessage" rows="3" placeholder="Your message..."></textarea>
-            <button id="sendContactBtn" style="background: #1e3c72;">Send message</button>
-            <a href="https://wa.me/919876543210?text=Hello%20AI%20BillWala" target="_blank" class="whatsapp-btn" style="background: #25D366; text-decoration: none; color: white; display: inline-block; text-align: center; padding: 12px; border-radius: 40px;">📱 Chat on WhatsApp</a>
-        </div>
-        <div id="contactStatus" style="margin-top: 12px; font-size: 0.8rem;"></div>
-    </div>
+    <div class="card"><h3>📺 How AI BillWala works</h3><div class="video-container"><iframe src="https://www.youtube.com/embed/PLACEHOLDER" frameborder="0" allowfullscreen></iframe></div><p style="color:#4a5568;">Replace video ID later.</p></div>
 
-    <div class="footer">
-        AI BillWala • Smart invoicing • Multi‑item support coming soon
-    </div>
+    <div class="card"><h3>📬 Contact us</h3><div class="contact-form"><input type="text" id="contactName" placeholder="Your name"><input type="email" id="contactEmail" placeholder="Email"><textarea rows="3" placeholder="Message"></textarea><button id="sendContactBtn">Send message</button><a href="https://wa.me/919876543210" target="_blank" class="whatsapp-btn">📱 Chat on WhatsApp</a></div><div id="contactStatus"></div></div>
+    <div class="footer">AI BillWala • Professional invoicing</div>
 </div>
 
 <script>
-    // ========== CONFIGURATION ==========
-    const BACKEND_URL = 'https://nameless-sky-1190.mohammedfarooqkareemuddin.workers.dev';  // your working worker
-
-    // ========== DOM elements ==========
+    const BACKEND_URL = 'https://nameless-sky-1190.mohammedfarooqkareemuddin.workers.dev';
     const promptInput = document.getElementById('promptInput');
     const generateBtn = document.getElementById('generateBtn');
     const resultCard = document.getElementById('resultCard');
     const invoiceContent = document.getElementById('invoiceContent');
+    const actionButtons = document.getElementById('actionButtons');
     const fileUploadArea = document.getElementById('fileUploadArea');
     const invoiceFile = document.getElementById('invoiceFile');
     const fileNameSpan = document.getElementById('fileName');
-    const filterBtns = document.querySelectorAll('.filter-btn');
 
-    // ========== Helper: Insert template based on category ==========
-    function insertTemplate(category) {
-        let template = '';
-        switch(category) {
-            case 'medical':
-                template = 'Xray 2 units at Rs 500\nMRI 1 unit at Rs 3000\nBed charges 3 days at Rs 2000/day\nMedicine: Paracetamol 10 tablets at Rs 15 each';
-                break;
-            case 'grocery':
-                template = 'Rice 5 kg at Rs 60/kg\nMilk 10 litres at Rs 55/litre\nVegetables 3 kg at Rs 40/kg';
-                break;
-            case 'transportation':
-                template = 'Taxi 20 km at Rs 15/km\nMetro pass 2 trips at Rs 50 each';
-                break;
-            case 'accounts':
-                template = 'Audit services 4 hours at Rs 1200/hr\nTax filing 1 service at Rs 2500';
-                break;
-            default: return;
-        }
-        promptInput.value = template;
-    }
-
-    // Filter button click handlers
-    filterBtns.forEach(btn => {
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const category = btn.dataset.category;
-            // Update active style
-            filterBtns.forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            // Insert template into description
-            insertTemplate(category);
-            // Show file upload area only for Medical
-            if (category === 'medical') {
-                fileUploadArea.classList.add('show');
-            } else {
-                fileUploadArea.classList.remove('show');
-                // Clear file input if hidden
-                invoiceFile.value = '';
-                fileNameSpan.textContent = '';
-            }
+            const cat = btn.dataset.category;
+            let template = '';
+            if (cat === 'medical') template = 'Xray 2 units at Rs 500\nMRI 1 unit at Rs 3000\nBed charges 3 days at Rs 2000/day\nMedicine 10 tablets at Rs 15';
+            else if (cat === 'grocery') template = 'Rice 5 kg at Rs 60/kg\nMilk 10 litres at Rs 55/litre\nVegetables 3 kg at Rs 40/kg';
+            else if (cat === 'transportation') template = 'Taxi 20 km at Rs 15/km\nMetro pass 2 trips at Rs 50 each';
+            else if (cat === 'accounts') template = 'Audit services 4 hours at Rs 1200/hr\nTax filing 1 service at Rs 2500';
+            promptInput.value = template;
+            if (cat === 'medical') fileUploadArea.classList.add('show');
+            else { fileUploadArea.classList.remove('show'); invoiceFile.value = ''; fileNameSpan.textContent = ''; }
         });
     });
 
-    // ========== File upload processing ==========
-    invoiceFile.addEventListener('change', async (event) => {
-        const file = event.target.files[0];
+    // File upload
+    invoiceFile.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
         if (!file) return;
         fileNameSpan.textContent = file.name;
-
-        try {
-            let fileContent = '';
-            if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                // Parse Excel using SheetJS
-                const data = await file.arrayBuffer();
-                const workbook = XLSX.read(data);
-                const sheetName = workbook.SheetNames[0];
-                const sheet = workbook.Sheets[sheetName];
-                const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                // Convert to text lines
-                const lines = json.map(row => row.filter(cell => cell).join(' ')).filter(l => l.length > 0);
-                fileContent = lines.join('\n');
-            } else {
-                // Text file
-                fileContent = await file.text();
-            }
-            // Append to existing description
-            const current = promptInput.value;
-            promptInput.value = current ? current + '\n' + fileContent : fileContent;
-        } catch (err) {
-            console.error('File read error:', err);
-            alert('Could not read file. Make sure it is a valid Excel or text file.');
+        let content = '';
+        if (file.name.match(/\.xlsx?$/)) {
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            content = json.map(row => row.filter(c => c).join(' ')).join('\n');
+        } else {
+            content = await file.text();
         }
+        promptInput.value = promptInput.value ? promptInput.value + '\n' + content : content;
     });
 
-    // ========== Invoice generation (same as before, using worker) ==========
+    // Generate invoice
     generateBtn.addEventListener('click', async () => {
         const prompt = promptInput.value.trim();
-        if (!prompt) {
-            alert('Please enter a description or upload a file.');
-            return;
-        }
-
+        if (!prompt) { alert('Please enter a description.'); return; }
         generateBtn.disabled = true;
         generateBtn.innerHTML = '<span class="loader"></span> Generating...';
         resultCard.style.display = 'none';
-
         try {
             const response = await fetch(BACKEND_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt })
+                body: JSON.stringify({ prompt })
             });
             const data = await response.json();
-            if (data.success && data.data) {
-                displayInvoice(data.data);
-            } else {
-                showError(data.error || 'Failed to generate invoice.');
-            }
-        } catch (err) {
-            console.error('Fetch error:', err);
-            showError('Network error: ' + err.message + '. Check your connection.');
-        } finally {
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = '✨ Generate Invoice';
-        }
+            if (data.success && data.data) { displayInvoice(data.data); actionButtons.style.display = 'flex'; }
+            else { showError(data.error || 'Generation failed'); actionButtons.style.display = 'none'; }
+        } catch (err) { showError('Network error: ' + err.message); actionButtons.style.display = 'none'; }
+        finally { generateBtn.disabled = false; generateBtn.innerHTML = '✨ Generate Invoice'; }
     });
 
     function displayInvoice(inv) {
-        const formatMoney = (amt) => `₹${amt.toLocaleString('en-IN')}`;
+        const formatMoney = (amt) => `₹${(amt || 0).toLocaleString('en-IN')}`;
         let itemsHtml = '';
         if (inv.items && inv.items.length) {
             inv.items.forEach(item => {
-                itemsHtml += `<tr><td>${escapeHtml(item.description)}</td><td style="text-align:center">${item.hours || 0}</td><td style="text-align:right">${formatMoney(item.rate || 0)}</td><td style="text-align:right">${formatMoney(item.total || 0)}</td></tr>`;
+                itemsHtml += `<tr><td>${escapeHtml(item.description || '')}</td><td style="text-align:center">${item.hours || 0}</td><td style="text-align:right">${formatMoney(item.rate)}</td><td style="text-align:right">${formatMoney(item.total)}</td></tr>`;
             });
-        } else {
-            itemsHtml = '<tr><td colspan="4" style="text-align:center">No items</td></tr>';
-        }
+        } else { itemsHtml = '<tr><td colspan="4">No items</td></tr>'; }
         const html = `
-            <div class="invoice-header">
-                <div class="invoice-title"><h2>INVOICE</h2></div>
-                <div class="invoice-meta">
-                    <p><strong>Invoice #:</strong> ${escapeHtml(inv.invoiceNumber)}</p>
-                    <p><strong>Date:</strong> ${escapeHtml(inv.date)}</p>
-                    <p><strong>Client:</strong> ${escapeHtml(inv.clientName || '—')}</p>
+            <div id="printArea">
+                <div class="invoice-header">
+                    <div class="invoice-title"><h2>INVOICE</h2></div>
+                    <div class="invoice-meta">
+                        <p><strong>Invoice #:</strong> ${escapeHtml(inv.invoiceNumber)}</p>
+                        <p><strong>Date:</strong> ${escapeHtml(inv.date)}</p>
+                        <p><strong>Client:</strong> ${escapeHtml(inv.clientName)}</p>
+                    </div>
                 </div>
-            </div>
-            <table><thead><tr><th>Description</th><th>Hours/Units</th><th>Rate</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
-            <div class="totals">
-                <p><strong>Subtotal:</strong> ${formatMoney(inv.subtotal || 0)}</p>
-                <p><strong>Tax (GST):</strong> ${formatMoney(inv.tax || 0)}</p>
-                <p style="font-size:1.3rem"><strong>Total Due:</strong> ${formatMoney(inv.amountDue || inv.total || 0)}</p>
-            </div>
-            <p style="text-align:center; margin-top:20px;">Thank you for your business!</p>
-        `;
+                <table><thead><tr><th>Description</th><th>Units</th><th>Rate</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
+                <div class="totals">
+                    <p><strong>Subtotal:</strong> ${formatMoney(inv.subtotal)}</p>
+                    <p><strong>Tax (GST):</strong> ${formatMoney(inv.tax)}</p>
+                    <p style="font-size:1.3rem"><strong>Total Due:</strong> ${formatMoney(inv.amountDue || inv.total)}</p>
+                </div>
+                <p style="text-align:center; margin-top:20px;">Thank you for your business!</p>
+            </div>`;
         invoiceContent.innerHTML = html;
         resultCard.style.display = 'block';
+        // Attach print handler
+        document.getElementById('printBtn').onclick = () => window.print();
     }
 
-    function showError(msg) {
-        invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}<br><br>💡 Example: "Web dev 5 hours at Rs 800/hr for XYZ Corp"</div>`;
-        resultCard.style.display = 'block';
-    }
+    function showError(msg) { invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}</div>`; resultCard.style.display = 'block'; }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    // ========== Contact form (temporary frontend only) ==========
-    const sendContactBtn = document.getElementById('sendContactBtn');
-    const contactStatus = document.getElementById('contactStatus');
-    sendContactBtn.addEventListener('click', () => {
+    // Contact form placeholder
+    document.getElementById('sendContactBtn').addEventListener('click', () => {
         const name = document.getElementById('contactName').value.trim();
         const email = document.getElementById('contactEmail').value.trim();
-        const message = document.getElementById('contactMessage').value.trim();
-        if (!name || !email || !message) {
-            contactStatus.innerText = '❌ Please fill all fields.';
-            return;
-        }
-        // Simulate send – you can later connect to a Google Form or email API
-        contactStatus.innerHTML = '✅ Message sent (demo). We will get back to you soon.';
-        // Clear form
-        document.getElementById('contactName').value = '';
-        document.getElementById('contactEmail').value = '';
-        document.getElementById('contactMessage').value = '';
-        setTimeout(() => { contactStatus.innerText = ''; }, 5000);
+        const msg = document.querySelector('#contactForm textarea').value.trim();
+        if (!name || !email || !msg) { document.getElementById('contactStatus').innerText = 'Please fill all fields.'; return; }
+        document.getElementById('contactStatus').innerHTML = '✅ Message sent (demo). We will reply soon.';
+        document.getElementById('contactName').value = ''; document.getElementById('contactEmail').value = ''; document.querySelector('#contactForm textarea').value = '';
+        setTimeout(() => document.getElementById('contactStatus').innerText = '', 3000);
     });
 </script>
 </body>
