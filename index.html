@@ -51,11 +51,27 @@
             .invoice-meta { text-align: left; }
             th, td { font-size: 0.85rem; padding: 8px 4px; }
         }
+        /* FIXED PRINT STYLES - ensures invoice content appears in PDF */
         @media print {
-            .card:not(#printArea), .filter-group, .input-group, .action-buttons, .footer, .contact-form, .video-container, .file-upload-area, .header p, button { display: none !important; }
-            .card { box-shadow: none; padding: 0; margin: 0; }
-            body { background: white; padding: 0; }
-            #printArea { margin: 0; padding: 0; }
+            /* Hide everything except the invoice content */
+            body * {
+                visibility: hidden;
+            }
+            #printArea, #printArea * {
+                visibility: visible;
+            }
+            #printArea {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                background: white;
+            }
+            .action-buttons, .generateBtn, .filter-group, .input-group, .file-upload-area, .video-container, .contact-form, .footer, .header {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -210,7 +226,7 @@
                         <p><strong>Client:</strong> ${escapeHtml(inv.clientName)}</p>
                     </div>
                 </div>
-                <table>
+                </table>
                     <thead><tr><th>Description</th><th>Units</th><th>Rate</th><th>Total</th></tr></thead>
                     <tbody>${itemsHtml}</tbody>
                 </table>
@@ -223,7 +239,13 @@
             </div>`;
         invoiceContent.innerHTML = html;
         resultCard.style.display = 'block';
-        document.getElementById('printBtn').onclick = () => window.print();
+        // Fix print button to ensure PDF captures content
+        const printBtn = document.getElementById('printBtn');
+        if (printBtn) {
+            printBtn.onclick = () => {
+                window.print();
+            };
+        }
     }
 
     function showError(msg) { invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}</div>`; resultCard.style.display = 'block'; }
