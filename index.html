@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>AI BillWala - Smart Invoice Generator</title>
-    <!-- SheetJS library for Excel parsing -->
+    <!-- SheetJS for Excel parsing -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * {
@@ -87,7 +87,25 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
         }
-        button {
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            align-items: center;
+        }
+        .action-row button {
+            width: auto;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+        .upload-btn {
+            background: #2a5298 !important;
+        }
+        .camera-btn {
+            background: #25D366 !important;
+        }
+        .main-btn {
             background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
             border: none;
@@ -98,12 +116,13 @@
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.2s;
             width: 100%;
+            margin-top: 10px;
         }
-        button:hover {
+        .main-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
         }
-        button:disabled {
+        .main-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
@@ -182,28 +201,6 @@
             padding: 10px 20px;
             background: #2a5298;
         }
-        .file-upload-area {
-            background: #f1f5f9;
-            border-radius: 16px;
-            padding: 16px;
-            margin-top: 10px;
-            display: none;
-        }
-        .file-upload-area.show {
-            display: block;
-        }
-        .file-label {
-            display: inline-block;
-            background: #3b82f6;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        .file-label input {
-            display: none;
-        }
         .video-container {
             position: relative;
             padding-bottom: 56.25%;
@@ -276,7 +273,7 @@
                 padding: 20px;
                 background: white;
             }
-            .action-buttons, .generateBtn, .filter-group, .input-group, .file-upload-area, .video-container, .contact-form, .footer, .header {
+            .action-buttons, .main-btn, .filter-group, .input-group, .action-row, .video-container, .contact-form, .footer, .header {
                 display: none !important;
             }
         }
@@ -286,7 +283,7 @@
 <div class="container">
     <div class="header">
         <h1>🧾 AI BillWala</h1>
-        <p>Describe your work or upload a medical invoice → instant invoice</p>
+        <p>Describe your work, upload a file, or take a photo → instant invoice</p>
     </div>
 
     <div class="card">
@@ -302,12 +299,18 @@
             <textarea id="promptInput" rows="4" placeholder="Example: Xray 2 units at Rs 500, MRI 1 at Rs 3000..."></textarea>
         </div>
 
-        <div id="fileUploadArea" class="file-upload-area">
-            <label class="file-label">📎 Upload Excel/TXT<input type="file" id="invoiceFile" accept=".xlsx, .xls, .csv, .txt"></label>
-            <span id="fileName" style="margin-left: 12px; color: #4a5568;"></span>
+        <!-- NEW: Upload & Camera Buttons -->
+        <div class="action-row">
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
+            <button id="uploadBtn" class="upload-btn">📎 Upload Excel/TXT</button>
+
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+            <button id="cameraBtn" class="camera-btn">📷 Take Photo</button>
+
+            <span id="fileName" style="color:#4a5568; font-size:0.9rem;"></span>
         </div>
 
-        <button id="generateBtn">✨ Generate Invoice</button>
+        <button id="generateBtn" class="main-btn">✨ Generate Invoice</button>
     </div>
 
     <div class="card" id="resultCard" style="display: none;">
@@ -343,7 +346,7 @@
 </div>
 
 <script>
-    // ✅ NEW WORKER URL (updated)
+    // 🔴 REPLACE WITH YOUR CLOUDFLARE WORKER URL
     const BACKEND_URL = 'https://winter-rice-e360.mohammedfarooqkareemuddin.workers.dev';
 
     const promptInput = document.getElementById('promptInput');
@@ -351,8 +354,6 @@
     const resultCard = document.getElementById('resultCard');
     const invoiceContent = document.getElementById('invoiceContent');
     const actionButtons = document.getElementById('actionButtons');
-    const fileUploadArea = document.getElementById('fileUploadArea');
-    const invoiceFile = document.getElementById('invoiceFile');
     const fileNameSpan = document.getElementById('fileName');
 
     // Filter buttons
@@ -367,47 +368,86 @@
             else if (cat === 'transportation') template = 'Taxi 20 km at Rs 15/km\nMetro pass 2 trips at Rs 50 each';
             else if (cat === 'accounts') template = 'Audit services 4 hours at Rs 1200/hr\nTax filing 1 service at Rs 2500';
             promptInput.value = template;
-            if (cat === 'medical') fileUploadArea.classList.add('show');
-            else { fileUploadArea.classList.remove('show'); invoiceFile.value = ''; fileNameSpan.textContent = ''; }
         });
     });
 
-    // File upload
-    invoiceFile.addEventListener('change', async (e) => {
+    // 📎 Upload file button
+    document.getElementById('uploadBtn').addEventListener('click', () => {
+        document.getElementById('fileInput').click();
+    });
+
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        fileNameSpan.textContent = file.name;
-        let content = '';
-        if (file.name.match(/\.xlsx?$/)) {
+        fileNameSpan.textContent = '📎 ' + file.name;
+        let text = '';
+        if (file.name.match(/\.(xlsx|xls)$/)) {
             const data = await file.arrayBuffer();
             const workbook = XLSX.read(data);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-            content = json.map(row => row.filter(c => c).join(' ')).join('\n');
+            text = json.map(row => row.filter(c => c).join(' ')).join('\n');
         } else {
-            content = await file.text();
+            text = await file.text();
         }
-        promptInput.value = promptInput.value ? promptInput.value + '\n' + content : content;
+        promptInput.value = text;
+    });
+
+    // 📷 Camera button
+    document.getElementById('cameraBtn').addEventListener('click', () => {
+        document.getElementById('cameraInput').click();
+    });
+
+    document.getElementById('cameraInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        fileNameSpan.textContent = '📷 Photo captured';
+        // Load Tesseract.js on demand
+        if (!window.Tesseract) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+            script.onload = async () => {
+                const result = await Tesseract.recognize(file, 'eng');
+                promptInput.value = result.data.text;
+            };
+            document.head.appendChild(script);
+        } else {
+            const result = await Tesseract.recognize(file, 'eng');
+            promptInput.value = result.data.text;
+        }
     });
 
     // Generate invoice
     generateBtn.addEventListener('click', async () => {
         const prompt = promptInput.value.trim();
-        if (!prompt) { alert('Please enter a description.'); return; }
+        if (!prompt) { alert('Please enter a description, upload a file, or take a photo.'); return; }
         generateBtn.disabled = true;
         generateBtn.innerHTML = '<span class="loader"></span> Generating...';
         resultCard.style.display = 'none';
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
             const response = await fetch(BACKEND_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt })
+                body: JSON.stringify({ prompt: prompt }),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
             const data = await response.json();
             if (data.success && data.data) { displayInvoice(data.data); actionButtons.style.display = 'flex'; }
             else { showError(data.error || 'Generation failed'); actionButtons.style.display = 'none'; }
-        } catch (err) { showError('Network error: ' + err.message); actionButtons.style.display = 'none'; }
-        finally { generateBtn.disabled = false; generateBtn.innerHTML = '✨ Generate Invoice'; }
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                showError('⏱️ Timeout: Apps Script took too long. Too many items?');
+            } else {
+                showError('Network error: ' + err.message);
+            }
+            actionButtons.style.display = 'none';
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = '✨ Generate Invoice';
+        }
     });
 
     function displayInvoice(inv) {
