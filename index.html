@@ -227,16 +227,6 @@
             border: 1px solid #cbd5e1;
             border-radius: 12px;
         }
-        .whatsapp-btn {
-            background: #25D366;
-            display: inline-block;
-            text-align: center;
-            margin-top: 16px;
-            text-decoration: none;
-            color: white;
-            padding: 12px;
-            border-radius: 40px;
-        }
         .footer {
             text-align: center;
             color: #6c757d;
@@ -277,6 +267,117 @@
                 display: none !important;
             }
         }
+
+        /* ====== CHAT BOT STYLES (FIXED) ====== */
+        .chat-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            transition: transform 0.2s;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-btn:hover {
+            transform: scale(1.1);
+        }
+        .chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            max-height: 450px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 9999;
+            overflow: hidden;
+            font-family: system-ui, sans-serif;
+        }
+        .chat-window.open {
+            display: flex;
+        }
+        .chat-header {
+            background: #1e3c72;
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header span {
+            font-weight: 600;
+        }
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            height: 280px;
+            background: #f8fafc;
+        }
+        .chat-msg {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .chat-msg.bot {
+            background: #e2e8f0;
+            align-self: flex-start;
+        }
+        .chat-msg.user {
+            background: #1e3c72;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .chat-input-area {
+            display: flex;
+            border-top: 1px solid #e2e8f0;
+            padding: 8px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 8px;
+            font-size: 14px;
+        }
+        .chat-input-area button {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        @media (max-width: 480px) {
+            .chat-window {
+                width: 90%;
+                right: 5%;
+                bottom: 80px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -299,7 +400,7 @@
             <textarea id="promptInput" rows="4" placeholder="Example: Xray 2 units at Rs 500, MRI 1 at Rs 3000..."></textarea>
         </div>
 
-        <!-- NEW: Upload & Camera Buttons -->
+        <!-- Upload & Camera Buttons -->
         <div class="action-row">
             <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
             <button id="uploadBtn" class="upload-btn">📎 Upload Excel/TXT</button>
@@ -334,14 +435,30 @@
             <input type="text" id="contactName" placeholder="Your name" required>
             <input type="email" id="contactEmail" placeholder="Email address" required>
             <textarea id="contactMessage" rows="3" placeholder="Your message..."></textarea>
-            <button id="sendContactBtn" style="background: #1e3c72;">Send message</button>
-            <a href="https://wa.me/919876543210?text=Hello%20AI%20BillWala" target="_blank" class="whatsapp-btn">📱 Chat on WhatsApp</a>
+            <!-- ✅ Fixed "Send message" button (white text on dark blue) -->
+            <button id="sendContactBtn" style="background:#1e3c72; color:white; border:none; padding:12px; border-radius:12px; font-size:1rem; cursor:pointer; font-weight:600; width:100%;">📨 Send message</button>
         </div>
         <div id="contactStatus" style="margin-top: 12px; font-size: 0.8rem;"></div>
     </div>
 
     <div class="footer">
         AI BillWala • Smart invoicing • Professional invoice generator
+    </div>
+</div>
+
+<!-- ====== CHAT BOT ====== -->
+<button id="chatToggle" class="chat-btn">💬</button>
+<div id="chatWindow" class="chat-window">
+    <div class="chat-header">
+        <span>🤖 AI BillWala Bot</span>
+        <button class="chat-close" onclick="document.getElementById('chatWindow').classList.remove('open')">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg bot">👋 Hello! Ask me about invoices, pricing, or how to generate one.</div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Type here..." />
+        <button id="chatSend">Send</button>
     </div>
 </div>
 
@@ -402,7 +519,6 @@
         const file = e.target.files[0];
         if (!file) return;
         fileNameSpan.textContent = '📷 Photo captured';
-        // Load Tesseract.js on demand
         if (!window.Tesseract) {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
@@ -496,16 +612,68 @@
 
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // Contact form (demo)
+    // ✅ Contact form submit button (fixed)
     document.getElementById('sendContactBtn').addEventListener('click', () => {
         const name = document.getElementById('contactName').value.trim();
         const email = document.getElementById('contactEmail').value.trim();
         const msg = document.getElementById('contactMessage').value.trim();
-        if (!name || !email || !msg) { document.getElementById('contactStatus').innerText = '❌ Please fill all fields.'; return; }
+        if (!name || !email || !msg) {
+            document.getElementById('contactStatus').innerHTML = '❌ Please fill all fields.';
+            return;
+        }
         document.getElementById('contactStatus').innerHTML = '✅ Message sent! We will reply soon.';
-        document.getElementById('contactName').value = ''; document.getElementById('contactEmail').value = ''; document.getElementById('contactMessage').value = '';
+        document.getElementById('contactName').value = '';
+        document.getElementById('contactEmail').value = '';
+        document.getElementById('contactMessage').value = '';
         setTimeout(() => document.getElementById('contactStatus').innerText = '', 3000);
     });
+
+    // ====== SIMPLE CHAT BOT ======
+    document.getElementById('chatToggle').addEventListener('click', function() {
+        document.getElementById('chatWindow').classList.toggle('open');
+    });
+
+    document.getElementById('chatSend').addEventListener('click', sendMessage);
+    document.getElementById('chatInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const msg = input.value.trim();
+        if (!msg) return;
+        appendMessage('user', msg);
+        input.value = '';
+        setTimeout(() => botReply(msg), 600);
+    }
+
+    function appendMessage(sender, text) {
+        const container = document.getElementById('chatMessages');
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + sender;
+        div.textContent = text;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function botReply(msg) {
+        const lower = msg.toLowerCase();
+        let reply = "I'm still learning. Try asking about 'invoice', 'price', or 'contact'.";
+
+        if (lower.includes('invoice') || lower.includes('bill')) {
+            reply = "📄 To generate an invoice, type your items into the text area (e.g., 'Xray 2 units at Rs 500'), or upload a file. Then click 'Generate Invoice'.";
+        } else if (lower.includes('price') || lower.includes('cost') || lower.includes('rate')) {
+            reply = "💰 The app automatically detects rates from your description. For example: 'MRI 1 at Rs 3000' will use Rs 3000 as the rate.";
+        } else if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
+            reply = "👋 Hello! How can I help you with your invoices today?";
+        } else if (lower.includes('contact') || lower.includes('support')) {
+            reply = "📬 You can use the contact form on our site. We reply within 24 hours.";
+        } else if (lower.includes('thanks') || lower.includes('thank you')) {
+            reply = "🙏 You're welcome! Let me know if you need anything else.";
+        }
+
+        appendMessage('bot', reply);
+    }
 </script>
 </body>
 </html>
