@@ -1,283 +1,73 @@
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .main-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
-        }
-        .main-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .invoice-preview {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-        }
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px dashed #cbd5e1;
-        }
-        .invoice-title h2 {
-            color: #1e3c72;
-            font-size: 1.5rem;
-        }
-        .invoice-meta p {
-            margin: 4px 0;
-            color: #475569;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            text-align: left;
-            padding: 12px 8px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        th {
-            background-color: #eef2ff;
-            color: #1e3c72;
-        }
-        .totals {
-            text-align: right;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid #cbd5e1;
-        }
-        .error-box {
-            background: #fee2e2;
-            border-left: 5px solid #ef4444;
-            padding: 15px;
-            border-radius: 12px;
-            color: #991b1b;
-            margin-top: 20px;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        .action-buttons button {
-            width: auto;
-            padding: 10px 20px;
-            background: #2a5298;
-        }
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 20px;
-            margin-bottom: 30px;
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .contact-form input, .contact-form textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-        }
-        .footer {
-            text-align: center;
-            color: #6c757d;
-            font-size: 0.8rem;
-            margin-top: 30px;
-        }
-        @media (max-width: 640px) {
-            .invoice-header {
-                flex-direction: column;
-                align-items: start;
-                gap: 10px;
-            }
-            .invoice-meta {
-                text-align: left;
-            }
-            th, td {
-                font-size: 0.85rem;
-                padding: 8px 4px;
-            }
-        }
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printArea, #printArea * {
-                visibility: visible;
-            }
-            #printArea {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                margin: 0;
-                padding: 20px;
-                background: white;
-            }
-            .action-buttons, .main-btn, .filter-group, .input-group, .action-row, .video-container, .contact-form, .footer, .header {
-                display: none !important;
-            }
-        }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AI BillWala - Smart Invoice Generator</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body { background:linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%); min-height:100vh; padding:20px; }
+        .container { max-width:1200px; margin:0 auto; }
+        .header { text-align:center; margin-bottom:30px; }
+        .header h1 { font-size:2rem; background:linear-gradient(135deg, #1e3c72, #2a5298); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:8px; }
+        .header p { color:#4a5568; }
+        .card { background:white; border-radius:24px; box-shadow:0 20px 35px -10px rgba(0,0,0,0.1); padding:24px; margin-bottom:30px; }
+        .filter-group { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:20px; }
+        .filter-btn { background:#e2e8f0; border:none; padding:8px 20px; border-radius:40px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .filter-btn.active { background:#2a5298; color:white; }
+        .input-group { margin-bottom:20px; }
+        label { display:block; font-weight:600; color:#2d3748; margin-bottom:8px; font-size:0.9rem; }
+        textarea { width:100%; padding:14px 16px; border:2px solid #e2e8f0; border-radius:16px; font-size:1rem; resize:vertical; transition:all 0.2s; }
+        textarea:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.2); }
+        .action-row { display:flex; flex-wrap:wrap; gap:10px; margin:15px 0; align-items:center; }
+        .action-row button { width:auto; padding:10px 20px; font-size:0.9rem; color:white !important; border:none; border-radius:40px; cursor:pointer; }
+        .upload-btn { background:#2a5298 !important; }
+        .camera-btn { background:#25D366 !important; }
+        .main-btn { background:linear-gradient(135deg, #1e3c72, #2a5298); color:white; border:none; padding:14px 28px; font-size:1rem; font-weight:600; border-radius:40px; cursor:pointer; width:100%; margin-top:10px; transition:all 0.2s; }
+        .main-btn:disabled { opacity:0.6; cursor:not-allowed; }
+        .loader { display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:white; animation:spin 0.6s linear infinite; vertical-align:middle; margin-right:8px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .invoice-preview { background:#f8fafc; border-radius:20px; padding:20px; border:1px solid #e2e8f0; }
+        .invoice-header { display:flex; justify-content:space-between; flex-wrap:wrap; margin-bottom:20px; padding-bottom:15px; border-bottom:2px dashed #cbd5e1; }
+        .invoice-title h2 { color:#1e3c72; font-size:1.5rem; }
+        .invoice-meta p { margin:4px 0; color:#475569; }
+        table { width:100%; border-collapse:collapse; margin:20px 0; }
+        th, td { padding:12px 8px; border-bottom:1px solid #e2e8f0; text-align:left; }
+        th { background-color:#eef2ff; color:#1e3c72; }
+        .totals { text-align:right; margin-top:20px; padding-top:15px; border-top:2px solid #cbd5e1; }
+        .error-box { background:#fee2e2; border-left:5px solid #ef4444; padding:15px; border-radius:12px; color:#991b1b; margin-top:20px; }
+        .action-buttons { display:flex; gap:12px; margin-top:20px; }
+        .action-buttons button { width:auto; padding:10px 20px; background:#2a5298; color:white; border:none; border-radius:40px; cursor:pointer; }
+        .video-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:20px; margin-bottom:30px; }
+        .video-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; }
+        .contact-form { display:flex; flex-direction:column; gap:16px; }
+        .contact-form input, .contact-form textarea { width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:12px; }
+        .contact-form button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:12px; font-size:1rem; font-weight:600; cursor:pointer; }
+        .footer { text-align:center; color:#6c757d; font-size:0.8rem; margin-top:30px; }
+        @media print { body * { visibility:hidden; } #printArea,#printArea * { visibility:visible; } #printArea { position:absolute; top:0; left:0; width:100%; padding:20px; background:white; } .action-buttons,.main-btn,.filter-group,.input-group,.action-row,.video-container,.contact-form,.footer,.header { display:none !important; } }
 
-        /* ====== CHAT BOT STYLES (FIXED) ====== */
-        .chat-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #1e3c72;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 9999;
-            transition: transform 0.2s;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-        }
-        .chat-btn:hover {
-            transform: scale(1.1);
-        }
-        .chat-window {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 320px;
-            max-height: 450px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-            display: none;
-            flex-direction: column;
-            z-index: 9999;
-            overflow: hidden;
-            font-family: system-ui, sans-serif;
-        }
-        .chat-window.open {
-            display: flex;
-        }
-        .chat-header {
-            background: #1e3c72;
-            color: white;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .chat-header span {
-            font-weight: 600;
-        }
-        .chat-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-        .chat-messages {
-            flex: 1;
-            padding: 12px;
-            overflow-y: auto;
-            height: 280px;
-            background: #f8fafc;
-        }
-        .chat-msg {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 12px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        .chat-msg.bot {
-            background: #e2e8f0;
-            align-self: flex-start;
-        }
-        .chat-msg.user {
-            background: #1e3c72;
-            color: white;
-            align-self: flex-end;
-            margin-left: auto;
-        }
-        .chat-input-area {
-            display: flex;
-            border-top: 1px solid #e2e8f0;
-            padding: 8px;
-        }
-        .chat-input-area input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 8px;
-            font-size: 14px;
-        }
-        .chat-input-area button {
-            background: #1e3c72;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        @media (max-width: 480px) {
-            .chat-window {
-                width: 90%;
-                right: 5%;
-                bottom: 80px;
-            }
-        }
+        /* CHAT BOT STYLES */
+        .chat-btn { position:fixed; bottom:20px; right:20px; background:#1e3c72; color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:28px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:9999; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; }
+        .chat-btn:hover { transform:scale(1.1); }
+        .chat-window { position:fixed; bottom:90px; right:20px; width:320px; max-height:450px; background:white; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.2); display:none; flex-direction:column; z-index:9999; overflow:hidden; font-family:system-ui,sans-serif; }
+        .chat-window.open { display:flex; }
+        .chat-header { background:#1e3c72; color:white; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; }
+        .chat-header span { font-weight:600; }
+        .chat-close { background:none; border:none; color:white; font-size:20px; cursor:pointer; }
+        .chat-messages { flex:1; padding:12px; overflow-y:auto; height:280px; background:#f8fafc; }
+        .chat-msg { margin-bottom:10px; padding:8px 12px; border-radius:12px; max-width:80%; word-wrap:break-word; }
+        .chat-msg.bot { background:#e2e8f0; align-self:flex-start; }
+        .chat-msg.user { background:#1e3c72; color:white; align-self:flex-end; margin-left:auto; }
+        .chat-input-area { display:flex; border-top:1px solid #e2e8f0; padding:8px; }
+        .chat-input-area input { flex:1; border:none; outline:none; padding:8px; font-size:14px; }
+        .chat-input-area button { background:#1e3c72; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; }
+        @media (max-width:480px) { .chat-window { width:90%; right:5%; bottom:80px; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1>🧾 AI BillWala</h1>
-        <p>Describe your work, upload a file, or take a photo → instant invoice</p>
-    </div>
+    <div class="header"><h1>🧾 AI BillWala</h1><p>Describe your work, upload a file, or take a photo → instant invoice</p></div>
 
     <div class="card">
         <div class="filter-group" id="filterGroup">
@@ -286,77 +76,58 @@
             <button class="filter-btn" data-category="transportation">🚗 Transportation</button>
             <button class="filter-btn" data-category="accounts">💰 Accounts</button>
         </div>
-
         <div class="input-group">
             <label>📝 Invoice description (or paste text)</label>
             <textarea id="promptInput" rows="4" placeholder="Example: Xray 2 units at Rs 500, MRI 1 at Rs 3000..."></textarea>
         </div>
-
-        <!-- Upload & Camera Buttons -->
         <div class="action-row">
             <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.txt" style="display:none;">
             <button id="uploadBtn" class="upload-btn">📎 Upload Excel/TXT</button>
-
             <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
             <button id="cameraBtn" class="camera-btn">📷 Take Photo</button>
-
-            <span id="fileName" style="color:#4a5568; font-size:0.9rem;"></span>
+            <span id="fileName" style="color:#1e3c72; font-weight:600;"></span>
         </div>
-
         <button id="generateBtn" class="main-btn">✨ Generate Invoice</button>
     </div>
 
-    <div class="card" id="resultCard" style="display: none;">
+    <div class="card" id="resultCard" style="display:none;">
         <div class="invoice-preview" id="invoiceContent"></div>
-        <div class="action-buttons" id="actionButtons" style="display: none;">
-            <button id="printBtn">🖨️ Print / Save as PDF</button>
-        </div>
+        <div class="action-buttons" id="actionButtons" style="display:none;"><button id="printBtn">🖨️ Print / Save as PDF</button></div>
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom: 16px;">📺 How AI BillWala works</h3>
-        <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/PLACEHOLDER" title="AI BillWala intro" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #4a5568;">Replace the video ID later – just edit the iframe `src`.</p>
+        <h3>📺 How AI BillWala works</h3>
+        <div class="video-container"><iframe src="https://www.youtube.com/embed/PLACEHOLDER" title="AI BillWala intro" frameborder="0" allowfullscreen></iframe></div>
+        <p style="color:#4a5568;">Replace the video ID later – just edit the iframe `src`.</p>
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom: 16px;">📬 Contact us</h3>
+        <h3>📬 Contact us</h3>
         <div class="contact-form" id="contactForm">
             <input type="text" id="contactName" placeholder="Your name" required>
             <input type="email" id="contactEmail" placeholder="Email address" required>
             <textarea id="contactMessage" rows="3" placeholder="Your message..."></textarea>
-            <!-- ✅ Fixed "Send message" button (white text on dark blue) -->
-            <button id="sendContactBtn" style="background:#1e3c72; color:white; border:none; padding:12px; border-radius:12px; font-size:1rem; cursor:pointer; font-weight:600; width:100%;">📨 Send message</button>
+            <button id="sendContactBtn">📨 Send message</button>
         </div>
-        <div id="contactStatus" style="margin-top: 12px; font-size: 0.8rem;"></div>
+        <div id="contactStatus" style="margin-top:12px; font-size:0.8rem;"></div>
     </div>
-
-    <div class="footer">
-        AI BillWala • Smart invoicing • Professional invoice generator
-    </div>
+    <div class="footer">AI BillWala • Smart invoicing • Professional invoice generator</div>
 </div>
 
-<!-- ====== CHAT BOT ====== -->
+<!-- ===== CHAT BOT ===== -->
 <button id="chatToggle" class="chat-btn">💬</button>
 <div id="chatWindow" class="chat-window">
-    <div class="chat-header">
-        <span>🤖 AI BillWala Bot</span>
-        <button class="chat-close" onclick="document.getElementById('chatWindow').classList.remove('open')">✕</button>
-    </div>
-    <div class="chat-messages" id="chatMessages">
-        <div class="chat-msg bot">👋 Hello! Ask me about invoices, pricing, or how to generate one.</div>
-    </div>
-    <div class="chat-input-area">
-        <input type="text" id="chatInput" placeholder="Type here..." />
-        <button id="chatSend">Send</button>
-    </div>
+    <div class="chat-header"><span>🤖 AI BillWala Bot</span><button class="chat-close" onclick="document.getElementById('chatWindow').classList.remove('open')">✕</button></div>
+    <div class="chat-messages" id="chatMessages"><div class="chat-msg bot">👋 Hello! Ask me anything about AI BillWala (invoices, pricing, uploading).</div></div>
+    <div class="chat-input-area"><input type="text" id="chatInput" placeholder="Type here..." /><button id="chatSend">Send</button></div>
 </div>
 
 <script>
-    // 🔴 REPLACE WITH YOUR CLOUDFLARE WORKER URL
+    // ✅ MAIN INVOICE GENERATOR WORKER
     const BACKEND_URL = 'https://winter-rice-e360.mohammedfarooqkareemuddin.workers.dev';
+    
+    // ✅ NEW CHATBOT WORKER URL
+    const CHATBOT_URL = 'https://rapid-base-d0e5.mohammedfarooqkareemuddin.workers.dev/chat';
 
     const promptInput = document.getElementById('promptInput');
     const generateBtn = document.getElementById('generateBtn');
@@ -365,26 +136,24 @@
     const actionButtons = document.getElementById('actionButtons');
     const fileNameSpan = document.getElementById('fileName');
 
-    // Filter buttons
+    // Filters
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             const cat = btn.dataset.category;
-            let template = '';
-            if (cat === 'medical') template = 'Xray 2 units at Rs 500\nMRI 1 unit at Rs 3000\nBed charges 3 days at Rs 2000/day\nMedicine 10 tablets at Rs 15';
-            else if (cat === 'grocery') template = 'Rice 5 kg at Rs 60/kg\nMilk 10 litres at Rs 55/litre\nVegetables 3 kg at Rs 40/kg';
-            else if (cat === 'transportation') template = 'Taxi 20 km at Rs 15/km\nMetro pass 2 trips at Rs 50 each';
-            else if (cat === 'accounts') template = 'Audit services 4 hours at Rs 1200/hr\nTax filing 1 service at Rs 2500';
-            promptInput.value = template;
+            const templates = {
+                medical: 'Xray 2 units at Rs 500\nMRI 1 unit at Rs 3000\nBed charges 3 days at Rs 2000/day\nMedicine 10 tablets at Rs 15',
+                grocery: 'Rice 5 kg at Rs 60/kg\nMilk 10 litres at Rs 55/litre\nVegetables 3 kg at Rs 40/kg',
+                transportation: 'Taxi 20 km at Rs 15/km\nMetro pass 2 trips at Rs 50 each',
+                accounts: 'Audit services 4 hours at Rs 1200/hr\nTax filing 1 service at Rs 2500'
+            };
+            promptInput.value = templates[cat] || '';
         });
     });
 
-    // 📎 Upload file button
-    document.getElementById('uploadBtn').addEventListener('click', () => {
-        document.getElementById('fileInput').click();
-    });
-
+    // Upload & Camera
+    document.getElementById('uploadBtn').addEventListener('click', () => document.getElementById('fileInput').click());
     document.getElementById('fileInput').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -402,11 +171,7 @@
         promptInput.value = text;
     });
 
-    // 📷 Camera button
-    document.getElementById('cameraBtn').addEventListener('click', () => {
-        document.getElementById('cameraInput').click();
-    });
-
+    document.getElementById('cameraBtn').addEventListener('click', () => document.getElementById('cameraInput').click());
     document.getElementById('cameraInput').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -435,22 +200,14 @@
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 30000);
-            const response = await fetch(BACKEND_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt }),
-                signal: controller.signal
-            });
+            const response = await fetch(BACKEND_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: prompt }), signal: controller.signal });
             clearTimeout(timeoutId);
             const data = await response.json();
             if (data.success && data.data) { displayInvoice(data.data); actionButtons.style.display = 'flex'; }
             else { showError(data.error || 'Generation failed'); actionButtons.style.display = 'none'; }
         } catch (err) {
-            if (err.name === 'AbortError') {
-                showError('⏱️ Timeout: Apps Script took too long. Too many items?');
-            } else {
-                showError('Network error: ' + err.message);
-            }
+            if (err.name === 'AbortError') showError('⏱️ Timeout: Apps Script took too long.');
+            else showError('Network error: ' + err.message);
             actionButtons.style.display = 'none';
         } finally {
             generateBtn.disabled = false;
@@ -463,33 +220,17 @@
         let itemsHtml = '';
         if (inv.items && inv.items.length) {
             inv.items.forEach(item => {
-                itemsHtml += `<tr>
-                    <td>${escapeHtml(item.description || '')}</td>
-                    <td style="text-align:center">${item.hours || 0}</td>
-                    <td style="text-align:right">${formatMoney(item.rate)}</td>
-                    <td style="text-align:right">${formatMoney(item.total)}</td>
-                </tr>`;
+                itemsHtml += `<tr><td>${escapeHtml(item.description || '')}</td><td style="text-align:center">${item.hours || 0}</td><td style="text-align:right">${formatMoney(item.rate)}</td><td style="text-align:right">${formatMoney(item.total)}</td></tr>`;
             });
         } else { itemsHtml = '<tr><td colspan="4">No items</td></tr>'; }
         const html = `
             <div id="printArea">
                 <div class="invoice-header">
                     <div class="invoice-title"><h2>INVOICE</h2></div>
-                    <div class="invoice-meta">
-                        <p><strong>Invoice #:</strong> ${escapeHtml(inv.invoiceNumber)}</p>
-                        <p><strong>Date:</strong> ${escapeHtml(inv.date)}</p>
-                        <p><strong>Client:</strong> ${escapeHtml(inv.clientName)}</p>
-                    </div>
+                    <div class="invoice-meta"><p><strong>Invoice #:</strong> ${escapeHtml(inv.invoiceNumber)}</p><p><strong>Date:</strong> ${escapeHtml(inv.date)}</p><p><strong>Client:</strong> ${escapeHtml(inv.clientName)}</p></div>
                 </div>
-                <table>
-                    <thead><tr><th>Description</th><th>Units</th><th>Rate</th><th>Total</th></tr></thead>
-                    <tbody>${itemsHtml}</tbody>
-                </table>
-                <div class="totals">
-                    <p><strong>Subtotal:</strong> ${formatMoney(inv.subtotal)}</p>
-                    <p><strong>Tax (GST):</strong> ${formatMoney(inv.tax)}</p>
-                    <p style="font-size:1.3rem"><strong>Total Due:</strong> ${formatMoney(inv.amountDue || inv.total)}</p>
-                </div>
+                <table><thead><tr><th>Description</th><th>Units</th><th>Rate</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
+                <div class="totals"><p><strong>Subtotal:</strong> ${formatMoney(inv.subtotal)}</p><p><strong>Tax (GST):</strong> ${formatMoney(inv.tax)}</p><p style="font-size:1.3rem"><strong>Total Due:</strong> ${formatMoney(inv.amountDue || inv.total)}</p></div>
                 <p style="text-align:center; margin-top:20px;">Thank you for your business!</p>
             </div>`;
         invoiceContent.innerHTML = html;
@@ -497,38 +238,24 @@
         document.getElementById('printBtn').onclick = () => window.print();
     }
 
-    function showError(msg) {
-        invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}</div>`;
-        resultCard.style.display = 'block';
-    }
-
+    function showError(msg) { invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}</div>`; resultCard.style.display = 'block'; }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // ✅ Contact form submit button (fixed)
+    // Contact form
     document.getElementById('sendContactBtn').addEventListener('click', () => {
         const name = document.getElementById('contactName').value.trim();
         const email = document.getElementById('contactEmail').value.trim();
         const msg = document.getElementById('contactMessage').value.trim();
-        if (!name || !email || !msg) {
-            document.getElementById('contactStatus').innerHTML = '❌ Please fill all fields.';
-            return;
-        }
+        if (!name || !email || !msg) { document.getElementById('contactStatus').innerHTML = '❌ Please fill all fields.'; return; }
         document.getElementById('contactStatus').innerHTML = '✅ Message sent! We will reply soon.';
-        document.getElementById('contactName').value = '';
-        document.getElementById('contactEmail').value = '';
-        document.getElementById('contactMessage').value = '';
+        document.getElementById('contactName').value = ''; document.getElementById('contactEmail').value = ''; document.getElementById('contactMessage').value = '';
         setTimeout(() => document.getElementById('contactStatus').innerText = '', 3000);
     });
 
-    // ====== SIMPLE CHAT BOT ======
-    document.getElementById('chatToggle').addEventListener('click', function() {
-        document.getElementById('chatWindow').classList.toggle('open');
-    });
-
+    // ===== CHAT BOT =====
+    document.getElementById('chatToggle').addEventListener('click', () => document.getElementById('chatWindow').classList.toggle('open'));
     document.getElementById('chatSend').addEventListener('click', sendMessage);
-    document.getElementById('chatInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
-    });
+    document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
     function sendMessage() {
         const input = document.getElementById('chatInput');
@@ -536,7 +263,7 @@
         if (!msg) return;
         appendMessage('user', msg);
         input.value = '';
-        setTimeout(() => botReply(msg), 600);
+        botReply(msg);
     }
 
     function appendMessage(sender, text) {
@@ -548,23 +275,31 @@
         container.scrollTop = container.scrollHeight;
     }
 
-    function botReply(msg) {
-        const lower = msg.toLowerCase();
-        let reply = "I'm still learning. Try asking about 'invoice', 'price', or 'contact'.";
-
-        if (lower.includes('invoice') || lower.includes('bill')) {
-            reply = "📄 To generate an invoice, type your items into the text area (e.g., 'Xray 2 units at Rs 500'), or upload a file. Then click 'Generate Invoice'.";
-        } else if (lower.includes('price') || lower.includes('cost') || lower.includes('rate')) {
-            reply = "💰 The app automatically detects rates from your description. For example: 'MRI 1 at Rs 3000' will use Rs 3000 as the rate.";
-        } else if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
-            reply = "👋 Hello! How can I help you with your invoices today?";
-        } else if (lower.includes('contact') || lower.includes('support')) {
-            reply = "📬 You can use the contact form on our site. We reply within 24 hours.";
-        } else if (lower.includes('thanks') || lower.includes('thank you')) {
-            reply = "🙏 You're welcome! Let me know if you need anything else.";
+    async function botReply(msg) {
+        appendMessage('bot', '🤔 Thinking...');
+        try {
+            const response = await fetch(CHATBOT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: `You are a helpful assistant for "AI BillWala" (an online invoice generator). Answer concisely and clearly. User question: ${msg}` }]
+                    }]
+                })
+            });
+            const data = await response.json();
+            const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm having trouble. Try again.";
+            // Remove "Thinking..." message
+            const container = document.getElementById('chatMessages');
+            const lastMsg = container.lastElementChild;
+            if (lastMsg && lastMsg.textContent === '🤔 Thinking...') lastMsg.remove();
+            appendMessage('bot', aiReply);
+        } catch (error) {
+            const container = document.getElementById('chatMessages');
+            const lastMsg = container.lastElementChild;
+            if (lastMsg && lastMsg.textContent === '🤔 Thinking...') lastMsg.remove();
+            appendMessage('bot', '⚠️ Network error. Please try again.');
         }
-
-        appendMessage('bot', reply);
     }
 </script>
 </body>
