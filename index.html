@@ -6,11 +6,11 @@
     <title>AI BillWala - Smart Invoice Generator</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
-        body { background:linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%); min-height:100vh; padding:20px; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui, sans-serif; }
+        body { background:linear-gradient(135deg,#f5f7fa 0%,#e9edf2 100%); min-height:100vh; padding:20px; }
         .container { max-width:1200px; margin:0 auto; }
         .header { text-align:center; margin-bottom:30px; }
-        .header h1 { font-size:2rem; background:linear-gradient(135deg, #1e3c72, #2a5298); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:8px; }
+        .header h1 { font-size:2rem; background:linear-gradient(135deg,#1e3c72,#2a5298); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:8px; }
         .header p { color:#4a5568; }
         .card { background:white; border-radius:24px; box-shadow:0 20px 35px -10px rgba(0,0,0,0.1); padding:24px; margin-bottom:30px; }
         .filter-group { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:20px; }
@@ -24,7 +24,7 @@
         .action-row button { width:auto; padding:10px 20px; font-size:0.9rem; color:white !important; border:none; border-radius:40px; cursor:pointer; }
         .upload-btn { background:#2a5298 !important; }
         .camera-btn { background:#25D366 !important; }
-        .main-btn { background:linear-gradient(135deg, #1e3c72, #2a5298); color:white; border:none; padding:14px 28px; font-size:1rem; font-weight:600; border-radius:40px; cursor:pointer; width:100%; margin-top:10px; transition:all 0.2s; }
+        .main-btn { background:linear-gradient(135deg,#1e3c72,#2a5298); color:white; border:none; padding:14px 28px; font-size:1rem; font-weight:600; border-radius:40px; cursor:pointer; width:100%; margin-top:10px; transition:all 0.2s; }
         .main-btn:disabled { opacity:0.6; cursor:not-allowed; }
         .loader { display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:white; animation:spin 0.6s linear infinite; vertical-align:middle; margin-right:8px; }
         @keyframes spin { to { transform:rotate(360deg); } }
@@ -123,11 +123,9 @@
 </div>
 
 <script>
-    // ✅ MAIN INVOICE GENERATOR WORKER (unchanged)
-    const BACKEND_URL = 'https://winter-rice-e360.mohammedfarooqkareemuddin.workers.dev';
-    
-    // ✅ NEW CHATBOT WORKER URL (UPDATED)
-    const CHATBOT_URL = 'https://wild-haze-5ecd.mohammedfarooqkareemuddin.workers.dev/chat';
+    // ✅ UPDATED WORKER URLS
+    const BACKEND_URL = 'https://wandering-forest-860f.mohammedfarooqkareemuddin.workers.dev/';
+    const CHATBOT_URL = 'https://misty-breeze-a072.mohammedfarooqkareemuddin.workers.dev/chat';
 
     const promptInput = document.getElementById('promptInput');
     const generateBtn = document.getElementById('generateBtn');
@@ -200,13 +198,23 @@
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 30000);
-            const response = await fetch(BACKEND_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: prompt }), signal: controller.signal });
+            const response = await fetch(BACKEND_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ prompt: prompt }), 
+                signal: controller.signal 
+            });
             clearTimeout(timeoutId);
             const data = await response.json();
-            if (data.success && data.data) { displayInvoice(data.data); actionButtons.style.display = 'flex'; }
-            else { showError(data.error || 'Generation failed'); actionButtons.style.display = 'none'; }
+            if (data.success && data.data) { 
+                displayInvoice(data.data); 
+                actionButtons.style.display = 'flex'; 
+            } else { 
+                showError(data.error || 'Generation failed'); 
+                actionButtons.style.display = 'none'; 
+            }
         } catch (err) {
-            if (err.name === 'AbortError') showError('⏱️ Timeout: Apps Script took too long.');
+            if (err.name === 'AbortError') showError('⏱️ Timeout: Server took too long.');
             else showError('Network error: ' + err.message);
             actionButtons.style.display = 'none';
         } finally {
@@ -252,7 +260,7 @@
         setTimeout(() => document.getElementById('contactStatus').innerText = '', 3000);
     });
 
-    // ===== CHAT BOT =====
+    // ===== AI CHAT BOT =====
     document.getElementById('chatToggle').addEventListener('click', () => document.getElementById('chatWindow').classList.toggle('open'));
     document.getElementById('chatSend').addEventListener('click', sendMessage);
     document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
@@ -289,7 +297,6 @@
             });
             const data = await response.json();
             const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm having trouble. Try again.";
-            // Remove "Thinking..." message
             const container = document.getElementById('chatMessages');
             const lastMsg = container.lastElementChild;
             if (lastMsg && lastMsg.textContent === '🤔 Thinking...') lastMsg.remove();
