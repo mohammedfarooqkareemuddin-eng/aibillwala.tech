@@ -124,8 +124,8 @@
 
 <script>
     // ✅ UPDATED WORKER URLS
-    const BACKEND_URL = 'https://wandering-forest-860f.mohammedfarooqkareemuddin.workers.dev/';
-    const CHATBOT_URL = 'https://misty-breeze-a072.mohammedfarooqkareemuddin.workers.dev/chat';
+    const BACKEND_URL = 'https://cold-haze-b404.mohammedfarooqkareemuddin.workers.dev/';
+    const CHATBOT_URL = 'https://spring-flower-4df7.mohammedfarooqkareemuddin.workers.dev/chat';
 
     const promptInput = document.getElementById('promptInput');
     const generateBtn = document.getElementById('generateBtn');
@@ -260,7 +260,7 @@
         setTimeout(() => document.getElementById('contactStatus').innerText = '', 3000);
     });
 
-    // ===== AI CHAT BOT =====
+    // ===== SIMPLE CHAT BOT =====
     document.getElementById('chatToggle').addEventListener('click', () => document.getElementById('chatWindow').classList.toggle('open'));
     document.getElementById('chatSend').addEventListener('click', sendMessage);
     document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
@@ -290,9 +290,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: `You are a helpful assistant for "AI BillWala" (an online invoice generator). Answer concisely and clearly. User question: ${msg}` }]
-                    }]
+                    contents: [{ parts: [{ text: msg }] }]
                 })
             });
             const data = await response.json();
