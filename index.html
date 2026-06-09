@@ -41,11 +41,8 @@
         .action-buttons button { width:auto; padding:10px 20px; background:#2a5298; color:white; border:none; border-radius:40px; cursor:pointer; }
         .video-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:20px; margin-bottom:30px; }
         .video-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; }
-        .contact-form { display:flex; flex-direction:column; gap:16px; }
-        .contact-form input, .contact-form textarea { width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:12px; }
-        .contact-form button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:12px; font-size:1rem; font-weight:600; cursor:pointer; }
         .footer { text-align:center; color:#6c757d; font-size:0.8rem; margin-top:30px; }
-        @media print { body * { visibility:hidden; } #printArea,#printArea * { visibility:visible; } #printArea { position:absolute; top:0; left:0; width:100%; padding:20px; background:white; } .action-buttons,.main-btn,.filter-group,.input-group,.action-row,.video-container,.contact-form,.footer,.header { display:none !important; } }
+        @media print { body * { visibility:hidden; } #printArea,#printArea * { visibility:visible; } #printArea { position:absolute; top:0; left:0; width:100%; padding:20px; background:white; } .action-buttons,.main-btn,.filter-group,.input-group,.action-row,.footer,.header { display:none !important; } }
 
         /* CHAT BOT STYLES */
         .chat-btn { position:fixed; bottom:20px; right:20px; background:#1e3c72; color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:28px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:9999; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; }
@@ -123,7 +120,7 @@
 </div>
 
 <script>
-    // ✅ UPDATED WORKER URLS
+    // ✅ WORKER URLS
     const BACKEND_URL = 'https://cold-haze-b404.mohammedfarooqkareemuddin.workers.dev/';
     const CHATBOT_URL = 'https://spring-flower-4df7.mohammedfarooqkareemuddin.workers.dev/chat';
 
@@ -249,15 +246,33 @@
     function showError(msg) { invoiceContent.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(msg)}</div>`; resultCard.style.display = 'block'; }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // Contact form
-    document.getElementById('sendContactBtn').addEventListener('click', () => {
+    // Contact form - Send to Formspree
+    document.getElementById('sendContactBtn').addEventListener('click', async () => {
         const name = document.getElementById('contactName').value.trim();
         const email = document.getElementById('contactEmail').value.trim();
         const msg = document.getElementById('contactMessage').value.trim();
-        if (!name || !email || !msg) { document.getElementById('contactStatus').innerHTML = '❌ Please fill all fields.'; return; }
-        document.getElementById('contactStatus').innerHTML = '✅ Message sent! We will reply soon.';
-        document.getElementById('contactName').value = ''; document.getElementById('contactEmail').value = ''; document.getElementById('contactMessage').value = '';
-        setTimeout(() => document.getElementById('contactStatus').innerText = '', 3000);
+        if (!name || !email || !msg) {
+            document.getElementById('contactStatus').innerHTML = '❌ Please fill all fields.';
+            return;
+        }
+        try {
+            const response = await fetch('https://formspree.io/f/xojzwljb', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, email: email, message: msg })
+            });
+            if (response.ok) {
+                document.getElementById('contactStatus').innerHTML = '✅ Message sent! We will reply soon.';
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactEmail').value = '';
+                document.getElementById('contactMessage').value = '';
+            } else {
+                document.getElementById('contactStatus').innerHTML = '❌ Failed to send. Try again.';
+            }
+        } catch (error) {
+            document.getElementById('contactStatus').innerHTML = '❌ Network error. Try again.';
+        }
+        setTimeout(() => document.getElementById('contactStatus').innerText = '', 5000);
     });
 
     // ===== SIMPLE CHAT BOT =====
