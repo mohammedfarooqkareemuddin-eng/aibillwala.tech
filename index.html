@@ -41,8 +41,11 @@
         .action-buttons button { width:auto; padding:10px 20px; background:#2a5298; color:white; border:none; border-radius:40px; cursor:pointer; }
         .video-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:20px; margin-bottom:30px; }
         .video-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; }
+        .contact-form { display:flex; flex-direction:column; gap:16px; }
+        .contact-form input, .contact-form textarea { width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:12px; }
+        .contact-form button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:12px; font-size:1rem; font-weight:600; cursor:pointer; }
         .footer { text-align:center; color:#6c757d; font-size:0.8rem; margin-top:30px; }
-        @media print { body * { visibility:hidden; } #printArea,#printArea * { visibility:visible; } #printArea { position:absolute; top:0; left:0; width:100%; padding:20px; background:white; } .action-buttons,.main-btn,.filter-group,.input-group,.action-row,.footer,.header { display:none !important; } }
+        @media print { body * { visibility:hidden; } #printArea,#printArea * { visibility:visible; } #printArea { position:absolute; top:0; left:0; width:100%; padding:20px; background:white; } .action-buttons,.main-btn,.filter-group,.input-group,.action-row,.video-container,.contact-form,.footer,.header { display:none !important; } }
 
         /* CHAT BOT STYLES */
         .chat-btn { position:fixed; bottom:20px; right:20px; background:#1e3c72; color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:28px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:9999; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; }
@@ -94,8 +97,10 @@
 
     <div class="card">
         <h3>📺 How AI BillWala works</h3>
-        <div class="video-container"><iframe src="https://www.youtube.com/embed/PLACEHOLDER" title="AI BillWala intro" frameborder="0" allowfullscreen></iframe></div>
-        <p style="color:#4a5568;">Replace the video ID later – just edit the iframe `src`.</p>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/h1lvB5hclMw" title="AI BillWala intro" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="color:#4a5568;">Watch this quick demo to see AI BillWala in action.</p>
     </div>
 
     <div class="card">
