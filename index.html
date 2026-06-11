@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>AI BillWala - Smart Invoice Generator</title>
+
+    <!-- ✅ Google Analytics for AI BillWala (using your existing ID) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YBGKY104LC"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-YBGKY104LC');
+    </script>
+
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui, sans-serif; }
@@ -87,7 +97,7 @@
             <button id="cameraBtn" class="camera-btn">📷 Take Photo</button>
             <span id="fileName" style="color:#1e3c72; font-weight:600;"></span>
         </div>
-        <!-- ✅ NEW LEAD CAPTURE FIELD -->
+        <!-- Lead capture field -->
         <div style="margin-top:15px;">
             <label>📧 Want a copy of your invoice sent to your email?</label>
             <input type="email" id="leadEmail" placeholder="Enter your email address" style="width:100%; padding:12px; border:2px solid #e2e8f0; border-radius:12px; font-size:1rem;">
@@ -138,7 +148,7 @@
     const invoiceContent = document.getElementById('invoiceContent');
     const actionButtons = document.getElementById('actionButtons');
     const fileNameSpan = document.getElementById('fileName');
-    const leadEmail = document.getElementById('leadEmail'); // ✅ Lead capture field
+    const leadEmail = document.getElementById('leadEmail');
 
     // Filters
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -215,7 +225,7 @@
             if (data.success && data.data) { 
                 displayInvoice(data.data); 
                 actionButtons.style.display = 'flex'; 
-                // ✅ Send lead email to Formspree if provided
+                // Send lead email to Formspree if provided
                 const email = leadEmail.value.trim();
                 if (email) {
                     await fetch('https://formspree.io/f/xojzwljb', {
