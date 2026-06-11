@@ -87,6 +87,11 @@
             <button id="cameraBtn" class="camera-btn">📷 Take Photo</button>
             <span id="fileName" style="color:#1e3c72; font-weight:600;"></span>
         </div>
+        <!-- ✅ NEW LEAD CAPTURE FIELD -->
+        <div style="margin-top:15px;">
+            <label>📧 Want a copy of your invoice sent to your email?</label>
+            <input type="email" id="leadEmail" placeholder="Enter your email address" style="width:100%; padding:12px; border:2px solid #e2e8f0; border-radius:12px; font-size:1rem;">
+        </div>
         <button id="generateBtn" class="main-btn">✨ Generate Invoice</button>
     </div>
 
@@ -97,9 +102,7 @@
 
     <div class="card">
         <h3>📺 How AI BillWala works</h3>
-        <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/h1lvB5hclMw" title="AI BillWala intro" frameborder="0" allowfullscreen></iframe>
-        </div>
+        <div class="video-container"><iframe src="https://www.youtube.com/embed/h1lvB5hclMw" title="AI BillWala intro" frameborder="0" allowfullscreen></iframe></div>
         <p style="color:#4a5568;">Watch this quick demo to see AI BillWala in action.</p>
     </div>
 
@@ -135,6 +138,7 @@
     const invoiceContent = document.getElementById('invoiceContent');
     const actionButtons = document.getElementById('actionButtons');
     const fileNameSpan = document.getElementById('fileName');
+    const leadEmail = document.getElementById('leadEmail'); // ✅ Lead capture field
 
     // Filters
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -211,6 +215,19 @@
             if (data.success && data.data) { 
                 displayInvoice(data.data); 
                 actionButtons.style.display = 'flex'; 
+                // ✅ Send lead email to Formspree if provided
+                const email = leadEmail.value.trim();
+                if (email) {
+                    await fetch('https://formspree.io/f/xojzwljb', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: "Lead from invoice generator",
+                            email: email,
+                            message: "User generated an invoice. Follow up for lead."
+                        })
+                    });
+                }
             } else { 
                 showError(data.error || 'Generation failed'); 
                 actionButtons.style.display = 'none'; 
