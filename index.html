@@ -54,7 +54,9 @@
         .contact-form { display:flex; flex-direction:column; gap:16px; }
         .contact-form input, .contact-form textarea { width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:12px; }
         .contact-form button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:12px; font-size:1rem; font-weight:600; cursor:pointer; }
-        .footer { text-align:center; color:#6c757d; font-size:0.8rem; margin-top:30px; }
+        .footer { text-align:center; color:#6c757d; font-size:0.8rem; margin-top:30px; padding:20px 0; border-top:1px solid #e2e8f0; }
+        .footer a { color:#2a5298; text-decoration:none; margin:0 10px; }
+        .footer a:hover { text-decoration:underline; }
         @media print { body * { visibility:hidden; } #printArea,#printArea * { visibility:visible; } #printArea { position:absolute; top:0; left:0; width:100%; padding:20px; background:white; } .action-buttons,.main-btn,.filter-group,.input-group,.action-row,.video-container,.contact-form,.footer,.header { display:none !important; } }
 
         /* CHAT BOT STYLES */
@@ -126,7 +128,18 @@
         </div>
         <div id="contactStatus" style="margin-top:12px; font-size:0.8rem;"></div>
     </div>
-    <div class="footer">AI BillWala • Smart invoicing • Professional invoice generator</div>
+
+    <!-- ===== UPDATED FOOTER WITH LEGAL LINKS ===== -->
+    <div class="footer">
+        <p>AI BillWala • Smart invoicing • Professional invoice generator</p>
+        <p style="margin-top:8px;">
+            <a href="/about.html">About Us</a> |
+            <a href="/privacy-policy.html">Privacy Policy</a> |
+            <a href="/terms-of-service.html">Terms of Service</a> |
+            <a href="#">Contact</a>
+        </p>
+        <p style="margin-top:8px; font-size:0.7rem; color:#94a3b8;">Built with ❤️ from India</p>
+    </div>
 </div>
 
 <!-- ===== CHAT BOT ===== -->
