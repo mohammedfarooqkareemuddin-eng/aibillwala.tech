@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - AI BillWala</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui, sans-serif; }
+        body { background:#f5f7fa; padding:20px; }
+        .container { max-width:700px; margin:0 auto; }
+        .card { background:white; border-radius:20px; padding:40px; box-shadow:0 10px 25px rgba(0,0,0,0.05); margin-top:20px; }
+        .card h1 { color:#1e3c72; font-size:2rem; margin-bottom:10px; }
+        .card p { color:#4a5568; line-height:1.8; margin-bottom:25px; }
+        .form-group { margin-bottom:20px; }
+        .form-group label { display:block; font-weight:600; color:#2d3748; margin-bottom:8px; }
+        .form-group input, .form-group textarea { width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:12px; font-size:1rem; }
+        .form-group input:focus, .form-group textarea:focus { outline:none; border-color:#2a5298; }
+        .submit-btn { background:#1e3c72; color:white; border:none; padding:14px 30px; border-radius:40px; font-size:1.1rem; font-weight:600; cursor:pointer; width:100%; }
+        .submit-btn:hover { background:#2a5298; }
+        .back-link { display:inline-block; margin-bottom:20px; color:#2a5298; font-weight:600; text-decoration:none; }
+        .back-link:hover { text-decoration:underline; }
+        .footer { text-align:center; color:#6c757d; font-size:0.9rem; padding:20px 0; border-top:1px solid #e2e8f0; margin-top:30px; }
+        .footer a { color:#2a5298; text-decoration:none; margin:0 10px; }
+        .footer a:hover { text-decoration:underline; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/" class="back-link">← Back to Invoice Generator</a>
+    <div class="card">
+        <h1>📬 Contact Us</h1>
+        <p>Have feedback, questions, or suggestions? We'd love to hear from you! Fill out the form below and we'll get back to you within 24 hours.</p>
+        
+        <form id="contactForm" onsubmit="alert('Thank you for your message! We\'ll respond within 24 hours.'); return false;">
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label>Your Email</label>
+                <input type="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label>Subject</label>
+                <input type="text" placeholder="Subject of your message">
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea rows="5" placeholder="Write your message here..." required></textarea>
+            </div>
+            <button type="submit" class="submit-btn">✉️ Send Message</button>
+        </form>
+    </div>
+    <div class="footer">
+        <a href="/">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+        <p>© 2026 AI BillWala. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>
